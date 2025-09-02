@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upgrade to Premium - MindVibe AI</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <h1>🧠 MindVibe AI</h1>
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="dashboard.html">Dashboard</a>
+        </div>
+    </nav>
+
+    <div style="min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; padding: 2rem; margin-top: 80px;">
+        <div style="background: white; border-radius: 20px; padding: 3rem; max-width: 500px; width: 100%; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+            <h2 style="text-align: center; margin-bottom: 2rem; color: #333; font-size: 2rem;">Upgrade to Premium</h2>
+            
+            <div style="text-align: center; margin-bottom: 2rem; padding: 2rem; background: #f8f9fa; border-radius: 15px;">
+                <div style="font-size: 3rem; font-weight: 800; color: #667eea; margin-bottom: 1rem;">KES 999<span style="font-size: 1rem; color: #666;">/month</span></div>
+                <ul style="list-style: none; text-align: left; margin: 1rem 0;">
+                    <li style="padding: 0.5rem 0; color: #333;">✅ Unlimited mood entries</li>
+                    <li style="padding: 0.5rem 0; color: #333;">✅ Advanced AI coaching</li>
+                    <li style="padding: 0.5rem 0; color: #333;">✅ Detailed mood analytics</li>
+                    <li style="padding: 0.5rem 0; color: #333;">✅ PDF mood reports</li>
+                    <li style="padding: 0.5rem 0; color: #333;">✅ Priority support</li>
+                </ul>
+            </div>
+
+            <form id="payment-form" style="margin-bottom: 2rem;">
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 600;">Email Address</label>
+                    <input type="email" id="email" required placeholder="your@email.com" 
+                           style="width: 100%; padding: 1rem; border: 2px solid #e9ecef; border-radius: 10px; font-size: 1rem; box-sizing: border-box;">
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 600;">Select Payment Method</label>
+                    <div id="payment-methods" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                        <button type="button" onclick="selectMethod('mpesa')" style="background: #f0f0f0; padding: 0.8rem 1rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">📱 M-Pesa</button>
+                        <button type="button" onclick="selectMethod('visa')" style="background: #f0f0f0; padding: 0.8rem 1rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">💳 Visa</button>
+                        <button type="button" onclick="selectMethod('mastercard')" style="background: #f0f0f0; padding: 0.8rem 1rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">💳 Mastercard</button>
+                        <button type="button" onclick="selectMethod('bank')" style="background: #f0f0f0; padding: 0.8rem 1rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">🏦 Bank</button>
+                    </div>
+                </div>
+
+                <div id="payment-details" style="margin-bottom: 1.5rem;"></div>
+
+                <button type="submit" id="pay-btn" 
+                        style="width: 100%; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 1.2rem 2rem; border-radius: 10px; font-size: 1.1rem; font-weight: 600; cursor: pointer;">
+                    Subscribe Now - KES 999
+                </button>
+            </form>
+
+            <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e9ecef;">
+                <p style="color: #666; font-size: 0.9rem;">🔒 Secure payment powered by InterSed</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedPaymentMethod = null;
+
+        function selectMethod(method) {
+            // Reset all buttons
+            document.querySelectorAll('#payment-methods button').forEach(btn => {
+                btn.style.background = '#f0f0f0';
+                btn.style.color = '#333';
+            });
+
+            // Highlight selected
+            event.target.style.background = '#667eea';
+            event.target.style.color = 'white';
+            selectedPaymentMethod = method;
+
+            // Show payment details form
+            const detailsDiv = document.getElementById('payment-details');
+            let html = '';
+
+            if (method === 'mpesa') {
+                html = '<label style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 600;">M-Pesa Phone Number</label>' +
+                       '<input type="tel" id="phone" placeholder="254712345678" style="width: 100%; padding: 1rem; border: 2px solid #e9ecef; border-radius: 10px; font-size: 1rem; box-sizing: border-box;">';
+            } else if (method === 'visa' || method === 'mastercard') {
+                html = '<label style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 600;">Card Number</label>' +
+                       '<input type="text" id="cardnum" placeholder="1234 5678 9012 3456" style="width: 100%; padding: 1rem; border: 2px solid #e9ecef; border-radius: 10px; font-size: 1rem; box-sizing: border-box; margin-bottom: 1rem;">' +
+                       '<div style="display: flex; gap: 1rem;">' +
+                       '<input type="text" id="expiry" placeholder="MM/YY" style="flex: 1; padding: 1rem; border: 2px solid #e9ecef; border-radius: 10px; font-size: 1rem;">' +
+                       '<input type="text" id="cvv" placeholder="123" style="flex: 1; padding: 1rem; border: 2px solid #e9ecef; border-radius: 10px; font-size: 1rem;">' +
+                       '</div>';
+            } else if (method === 'bank') {
+                html = '<label style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 600;">Select Bank</label>' +
+                       '<select id="bankname" style="width: 100%; padding: 1rem; border: 2px solid #e9ecef; border-radius: 10px; font-size: 1rem; margin-bottom: 1rem;">' +
+                       '<option>Equity Bank</option><option>KCB Bank</option><option>Co-operative Bank</option>' +
+                       '</select>' +
+                       '<label style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 600;">Account Number</label>' +
+                       '<input type="text" id="account" placeholder="Enter account number" style="width: 100%; padding: 1rem; border: 2px solid #e9ecef; border-radius: 10px; font-size: 1rem; box-sizing: border-box;">';
+            }
+
+            detailsDiv.innerHTML = html;
+        }
+
+        document.getElementById('payment-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            if (!email) {
+                alert('Please enter your email');
+                return;
+            }
+            
+            if (!selectedPaymentMethod) {
+                alert('Please select a payment method');
+                return;
+            }
+
+            // Simulate payment
+            document.getElementById('pay-btn').textContent = 'Processing...';
+            
+            setTimeout(() => {
+                alert('Payment successful! Welcome to Premium.');
+                window.location.href = 'dashboard.html';
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
