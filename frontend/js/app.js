@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'https://mindvibe-ai.onrender.com';
 let moodChart = null;
 let moodHistory = [];
 
@@ -89,7 +89,7 @@ async function analyzeMood() {
         
     } catch (error) {
         console.error('Error analyzing mood:', error);
-        alert('Error analyzing mood. Please make sure your backend is running on http://localhost:5000');
+        alert('Error analyzing mood. Please make sure your backend is running on https://mindvibe-ai.onrender.com');
     } finally {
         setTimeout(() => {
             analyzeBtn.innerHTML = 'Analyze My Mood 🧠';
