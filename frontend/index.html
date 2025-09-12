@@ -12,14 +12,11 @@
         padding: 0;
         color: white;
         min-height: 100vh;
-        /* Updated to match dashboard gradient */
         background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
         overflow-x: hidden;
-        /* Add the same complex gradient overlay as dashboard */
         position: relative;
     }
 
-    /* Add the same gradient overlay container as dashboard */
     body::before {
         content: '';
         position: fixed;
@@ -53,8 +50,8 @@
         letter-spacing: 2px;
         background: linear-gradient(135deg, #78dbff, #ff77c6);
         -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
         background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 
     .nav-links {
@@ -81,7 +78,6 @@
         align-items: center;
         justify-content: space-between;
         padding: 6rem 2rem 4rem 2rem;
-        /* Remove the old background, let the body gradient show through */
     }
 
     .hero-content {
@@ -94,8 +90,8 @@
         margin-bottom: 1.5rem;
         background: linear-gradient(135deg, #78dbff, #ff77c6);
         -webkit-background-clip: text;
-background-clip: text;
--webkit-text-fill-color: transparent;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
         line-height: 1.2;
     }
 
@@ -205,8 +201,8 @@ background-clip: text;
         margin-bottom: 3rem;
         background: linear-gradient(135deg, #78dbff, #ff77c6);
         -webkit-background-clip: text;
-background-clip: text;
--webkit-text-fill-color: transparent;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 
     .features-grid, .pricing-cards {
@@ -293,6 +289,51 @@ background-clip: text;
         border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
 
+    .footer-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        text-align: left;
+        margin-bottom: 2rem;
+    }
+
+    .footer-section h4 {
+        color: #78dbff;
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+    }
+
+    .footer-section a {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        display: block;
+        margin-bottom: 0.5rem;
+        transition: color 0.3s ease;
+    }
+
+    .footer-section a:hover {
+        color: #78dbff;
+    }
+
+    .support-highlight {
+        background: rgba(120, 219, 255, 0.1);
+        border: 1px solid rgba(120, 219, 255, 0.3);
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .crisis-notice {
+        background: rgba(255, 107, 107, 0.1);
+        border: 1px solid rgba(255, 107, 107, 0.3);
+        border-radius: 10px;
+        padding: 1rem;
+        margin-top: 1rem;
+        font-size: 0.9rem;
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
         .navbar {
@@ -327,6 +368,15 @@ background-clip: text;
         .features, .pricing {
             padding: 3rem 1rem;
         }
+
+        .footer-content {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+
+        .crisis-notice div {
+            grid-template-columns: 1fr !important;
+        }
     }
 
     @media (min-width: 769px) {
@@ -352,11 +402,11 @@ background-clip: text;
         <h1>🧠 MindVibe AI</h1>
     </div>
     <div class="nav-links">
-        <a href="#features">Features</a>
-        <a href="#pricing">Pricing</a>
-        <a href="pricing.html" class="btn-primary">Get Started</a>
-        <a href="dashboard.html" class="btn-primary">Start Free →</a>
-    </div>
+    <a href="auth.html" class="btn-secondary">Sign Up</a>
+    <a href="auth.html" class="btn-primary">Log In</a>
+    <a href="#features">Features</a>
+    <a href="#pricing">Pricing</a>
+</div>
 </nav>
 
 <main>
@@ -413,7 +463,7 @@ background-clip: text;
                     <li>Basic AI analysis</li>
                     <li>Simple mood tracking</li>
                 </ul>
-                <a href="pricing.html" class="btn-secondary">Get Started</a>
+                <a href="auth.html" class="btn-secondary">Start Free</a>
             </div>
             <div class="pricing-card featured">
                 <h3>Premium</h3>
@@ -432,7 +482,65 @@ background-clip: text;
 </main>
 
 <footer>
-    <p>&copy; 2025 MindVibe AI.</p>
+    <div class="support-highlight">
+        <h4 style="color: #78dbff; margin-bottom: 1rem; text-align: center;">Need Support? We're Here to Help</h4>
+        <div style="text-align: center;">
+            <p style="margin-bottom: 1rem; color: rgba(255,255,255,0.9);">
+                For technical assistance and app-related questions, reach out anytime.
+            </p>
+            <a href="mailto:support@mindvibe-ai.help" style="color: #78dbff; text-decoration: none; font-weight: 600;">
+                support@mindvibe-ai.help
+            </a>
+        </div>
+        
+        <div class="crisis-notice">
+            <strong style="color: #ff6b6b;">Mental Health Crisis Support:</strong> 
+            If you're experiencing a mental health emergency, please contact professional crisis services immediately:
+            <div style="margin-top: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; font-size: 0.9rem;">
+                <div>
+                    <strong>🌍 Global Resources:</strong><br>
+                    • <a href="https://findahelpline.com" target="_blank" style="color: #78dbff;">Find A Helpline</a> - 1,600+ crisis services<br>
+                    • <strong>Emergency:</strong> Your local emergency services
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-content">
+        <div class="footer-section">
+            <h4>Product</h4>
+            <a href="#features">Features</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="onboarding.html">Assessment</a>
+            <a href="#pricing">Pricing</a>
+        </div>
+        
+        <div class="footer-section">
+            <h4>Support</h4>
+            <a href="mailto:support@mindvibe-ai.help">Technical Support</a>
+            <a href="mailto:feedback@mindvibe-ai.help">Send Feedback</a>
+            <a href="#" onclick="alert('Privacy policy coming soon')">Privacy Policy</a>
+            <a href="#" onclick="alert('Terms of service coming soon')">Terms of Service</a>
+        </div>
+        
+        <div class="footer-section">
+            <h4>Connect</h4>
+            <a href="https://github.com/Kimberly-ops177" target="_blank">GitHub</a>
+            <a href="https://linkedin.com/in/kimberly-githinji" target="_blank">LinkedIn</a>
+            <a href="mailto:feedback@mindvibe-ai.help">Send Feedback</a>
+        </div>
+        
+        <div class="footer-section">
+            <h4>Mental Health Resources</h4>
+            <a href="https://www.nami.org" target="_blank">NAMI</a>
+            <a href="https://www.mentalhealth.gov" target="_blank">MentalHealth.gov</a>
+            <a href="https://www.who.int/health-topics/mental-health" target="_blank">WHO Mental Health</a>
+        </div>
+    </div>
+    
+    <div style="text-align: center; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1);">
+        <p>&copy; 2025 MindVibe AI. Built with care for mental wellness.</p>
+    </div>
 </footer>
 
 <script>

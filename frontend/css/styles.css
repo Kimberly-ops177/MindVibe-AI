@@ -12,7 +12,7 @@ body {
 
 /* Landing Page Styles */
 body:not(.dashboard-body) {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #08090e 0%, #1d123a 100%);
     min-height: 100vh;
 }
 

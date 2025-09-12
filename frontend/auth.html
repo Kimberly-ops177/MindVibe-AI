@@ -1,28 +1,524 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MindVibe AI - Login</title>
-<link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindVibe AI - Sign In</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: white;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            overflow-x: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 40%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 80%, rgba(120, 219, 255, 0.15) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .auth-container {
+            position: relative;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .auth-container:hover {
+            transform: translateY(-5px);
+            border-color: rgba(120, 219, 255, 0.3);
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .brain-icon {
+            font-size: 2.5rem;
+        }
+
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #78dbff, #ff77c6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-title {
+            font-size: 1.8rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #78dbff, #ff77c6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .auth-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 0.5rem;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 0.8rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #78dbff, #ff77c6);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .auth-form {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #78dbff;
+            box-shadow: 0 0 0 3px rgba(120, 219, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .password-toggle {
+            position: relative;
+        }
+
+        .toggle-btn {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .auth-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #78dbff, #ff77c6);
+            color: white;
+            border: none;
+            padding: 1.2rem 2rem;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(120, 219, 255, 0.3);
+            margin-bottom: 1.5rem;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(120, 219, 255, 0.4);
+        }
+
+        .auth-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 1.5rem 0;
+            position: relative;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .divider span {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 0 1rem;
+        }
+
+        .social-auth {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .social-btn {
+            flex: 1;
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .social-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .forgot-password a {
+            color: #78dbff;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        .auth-footer {
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        .auth-footer a {
+            color: #78dbff;
+            text-decoration: none;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .back-home {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .back-home:hover {
+            color: #78dbff;
+        }
+
+        @media (max-width: 768px) {
+            .auth-container {
+                margin: 1rem;
+                padding: 2rem;
+            }
+
+            .social-auth {
+                flex-direction: column;
+            }
+
+            .back-home {
+                position: relative;
+                top: auto;
+                left: auto;
+                margin-bottom: 2rem;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="auth-container">
-    <h2>Welcome Back</h2>
-    <form id="loginForm">
-        <input type="email" id="email" placeholder="Email" required>
-        <input type="password" id="password" placeholder="Password" required>
-        <button type="submit">Login</button>
-    </form>
-    <p>Don't have an account? <a href="onboarding.html">Sign Up</a></p>
-</div>
+    <a href="index.html" class="back-home">
+        ← Back to Home
+    </a>
 
-<script>
-document.getElementById('loginForm').addEventListener('submit', function(e){
-    e.preventDefault();
-    // Temporary: redirect to onboarding for first-time flow
-    window.location.href = 'onboarding.html';
-});
-</script>
+    <div class="auth-container">
+        <div class="logo-section">
+            <div class="logo">
+                <span class="brain-icon">🧠</span>
+                <span class="logo-text">MindVibe AI</span>
+            </div>
+        </div>
+
+        <div class="auth-header">
+            <h1 class="auth-title" id="authTitle">Welcome Back</h1>
+            <p class="auth-subtitle" id="authSubtitle">Sign in to continue your mental wellness journey</p>
+        </div>
+
+        <div class="auth-tabs">
+            <button class="tab-btn active" id="loginTab" onclick="switchTab('login')">Log In</button>
+            <button class="tab-btn" id="signupTab" onclick="switchTab('signup')">Sign Up</button>
+        </div>
+
+        <form class="auth-form" id="authForm">
+            <div class="form-group" id="nameGroup" style="display: none;">
+                <label class="form-label">Full Name</label>
+                <input type="text" class="form-input" id="fullName" placeholder="Enter your full name">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" class="form-input" id="email" placeholder="Enter your email" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <div class="password-toggle">
+                    <input type="password" class="form-input" id="password" placeholder="Enter your password" required>
+                    <button type="button" class="toggle-btn" onclick="togglePassword()">👁️</button>
+                </div>
+            </div>
+
+            <div class="form-group" id="confirmGroup" style="display: none;">
+                <label class="form-label">Confirm Password</label>
+                <div class="password-toggle">
+                    <input type="password" class="form-input" id="confirmPassword" placeholder="Confirm your password">
+                    <button type="button" class="toggle-btn" onclick="toggleConfirmPassword()">👁️</button>
+                </div>
+            </div>
+
+            <button type="submit" class="auth-btn" id="authButton">Sign In</button>
+        </form>
+
+        <div class="forgot-password" id="forgotPassword">
+            <a href="#" onclick="showForgotPassword()">Forgot your password?</a>
+        </div>
+
+        <div class="divider">
+            <span>or continue with</span>
+        </div>
+
+        <div class="social-auth">
+            <button class="social-btn" onclick="socialLogin('google')">
+                🔵 Google
+            </button>
+            <button class="social-btn" onclick="socialLogin('apple')">
+                🍎 Apple
+            </button>
+        </div>
+
+        <div class="auth-footer">
+            <p>By continuing, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></p>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'login';
+
+        function switchTab(mode) {
+            currentMode = mode;
+            const loginTab = document.getElementById('loginTab');
+            const signupTab = document.getElementById('signupTab');
+            const authTitle = document.getElementById('authTitle');
+            const authSubtitle = document.getElementById('authSubtitle');
+            const authButton = document.getElementById('authButton');
+            const nameGroup = document.getElementById('nameGroup');
+            const confirmGroup = document.getElementById('confirmGroup');
+            const forgotPassword = document.getElementById('forgotPassword');
+
+            if (mode === 'login') {
+                loginTab.classList.add('active');
+                signupTab.classList.remove('active');
+                authTitle.textContent = 'Welcome Back';
+                authSubtitle.textContent = 'Sign in to continue your mental wellness journey';
+                authButton.textContent = 'Sign In';
+                nameGroup.style.display = 'none';
+                confirmGroup.style.display = 'none';
+                forgotPassword.style.display = 'block';
+            } else {
+                signupTab.classList.add('active');
+                loginTab.classList.remove('active');
+                authTitle.textContent = 'Join MindVibe AI';
+                authSubtitle.textContent = 'Start your personalized mental wellness journey';
+                authButton.textContent = 'Create Account';
+                nameGroup.style.display = 'block';
+                confirmGroup.style.display = 'block';
+                forgotPassword.style.display = 'none';
+            }
+        }
+
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleBtn = passwordInput.nextElementSibling;
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = '👁️';
+            }
+        }
+
+        function toggleConfirmPassword() {
+            const confirmInput = document.getElementById('confirmPassword');
+            const toggleBtn = confirmInput.nextElementSibling;
+            
+            if (confirmInput.type === 'password') {
+                confirmInput.type = 'text';
+                toggleBtn.textContent = '🙈';
+            } else {
+                confirmInput.type = 'password';
+                toggleBtn.textContent = '👁️';
+            }
+        }
+
+        function socialLogin(provider) {
+            alert(`${provider} login would be implemented here`);
+            // In a real app, this would handle OAuth flow
+        }
+
+        function showForgotPassword() {
+            alert('Password reset email would be sent');
+            // In a real app, this would show forgot password form
+        }
+
+        document.getElementById('authForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const authButton = document.getElementById('authButton');
+            
+            if (!email || !password) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            if (currentMode === 'signup') {
+                const fullName = document.getElementById('fullName').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                if (!fullName) {
+                    alert('Please enter your full name');
+                    return;
+                }
+                
+                if (password !== confirmPassword) {
+                    alert('Passwords do not match');
+                    return;
+                }
+                
+                if (password.length < 8) {
+                    alert('Password must be at least 8 characters long');
+                    return;
+                }
+            }
+            
+            // Simulate authentication
+            authButton.textContent = 'Processing...';
+            authButton.disabled = true;
+            
+            setTimeout(() => {
+                if (currentMode === 'signup') {
+                    alert('Account created successfully!');
+                    // Redirect to onboarding for new users
+                    window.location.href = 'onboarding.html';
+                } else {
+                    alert('Login successful!');
+                    // Redirect to dashboard for existing users
+                    window.location.href = 'dashboard.html';
+                }
+            }, 1500);
+        });
+    </script>
 </body>
 </html>
