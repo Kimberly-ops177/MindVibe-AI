@@ -311,20 +311,23 @@
 
         /* Mood Heatmap */
         .heatmap-container {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 3px;
-            margin-top: 1rem;
-        }
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-top: 1rem;
+    width: 100%;
+    max-width: 200px;
+}
 
         .heatmap-day {
-            aspect-ratio: 1;
-            border-radius: 3px;
-            background: rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            position: relative;
-        }
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
 
         .heatmap-day:hover::after {
             content: attr(data-mood);
@@ -520,17 +523,29 @@
                     </div>
                 </div>
 
-                <div class="content-card">
-                    <h2 style="color: var(--primary-blue); margin-bottom: 1.5rem;">Mood Heatmap - Last 4 Weeks</h2>
-                    <div class="heatmap-container" id="mood-heatmap"></div>
-                </div>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+    <div class="content-card">
+        <h2 style="color: var(--primary-blue); margin-bottom: 1.5rem;">📊 Mood Frequency</h2>
+        <div style="height: 300px; position: relative;">
+            <canvas id="mood-frequency-chart"></canvas>
+        </div>
+    </div>
 
-                <div class="content-card">
-                    <h2 style="color: var(--primary-blue); margin-bottom: 1.5rem;">Wellness Journey</h2>
-                    <div style="height: 300px; position: relative;">
-                        <canvas id="mood-chart"></canvas>
-                    </div>
-                </div>
+    <div class="content-card">
+        <h2 style="color: var(--primary-blue); margin-bottom: 1.5rem;">📈 Mood Timeline</h2>
+        <div style="height: 300px; position: relative;">
+            <canvas id="mood-timeline-chart"></canvas>
+        </div>
+    </div>
+</div>
+
+    <div class="content-card" style="grid-column: span 2;">
+        <h2 style="color: var(--primary-blue); margin-bottom: 1.5rem;">🗓️ Mood Heatmap (Last 30 Days)</h2>
+        <div id="heatmap" style="display: grid; grid-template-columns: repeat(30, 1fr); gap: 4px; height: 40px;">
+        <!-- Days will be filled by JS -->
+    </div>
+</div>
+
             </main>
 
             <!-- Right Panel -->
@@ -584,345 +599,241 @@
         let recognition = null;
         let currentTheme = 'dark';
 
-        document.addEventListener('DOMContentLoaded', function() {
-            setupEventListeners();
-            initializeMoodChart();
-            generateMoodHeatmap();
-            updateStats();
-            initializeVoiceRecognition();
+            const moods = [];
+            let moodFrequencyChart;
+            let moodTimelineChart;
+
+  // Initialize Charts
+    function initializeCharts() {
+    const ctxFrequency = document.getElementById('mood-frequency-chart').getContext('2d');
+    moodFrequencyChart = new Chart(ctxFrequency, {
+        type: 'bar',
+        data: {
+        labels: ['Happy', 'Sad', 'Calm', 'Anxious'],
+        datasets: [{
+            label: 'Mood Frequency',
+            data: [0, 0, 0, 0],
+            backgroundColor: ['#78dbff', '#ff77c6', '#48dbfb', '#ff6b6b']
+        }]
+    },
+        options: {
+        responsive: true,
+        plugins: { legend: { display: false } }
+    }
+    });
+
+    const ctxTimeline = document.getElementById('mood-timeline-chart').getContext('2d');
+    moodTimelineChart = new Chart(ctxTimeline, {
+        type: 'line',
+        data: {
+        labels: [],
+        datasets: [{
+        label: 'Mood Timeline',
+        data: [],
+        borderColor: '#78dbff',
+        backgroundColor: 'rgba(120,219,255,0.2)',
+        fill: true,
+        tension: 0.3
+        }]
+    },
+    options: { responsive: true }
+    });
+    }
+
+  // Update Charts
+    function updateCharts() {
+    const moodCounts = { Happy: 0, Sad: 0, Calm: 0, Anxious: 0 };
+    moods.forEach(m => moodCounts[m.mood]++);
+    moodFrequencyChart.data.datasets[0].data = [
+        moodCounts.Happy,
+        moodCounts.Sad,
+        moodCounts.Calm,
+        moodCounts.Anxious
+    ];
+    moodFrequencyChart.update();
+
+    moodTimelineChart.data.labels = moods.map(m => m.time);
+    moodTimelineChart.data.datasets[0].data = moods.map(m => {
+        if (m.mood === 'Happy') return 4;
+        if (m.mood === 'Calm') return 3;
+        if (m.mood === 'Sad') return 2;
+        if (m.mood === 'Anxious') return 1;
+    });
+    moodTimelineChart.update();
+    }
+
+  // Update Heatmap
+    function updateHeatmap() {
+    const heatmap = document.getElementById('heatmap');
+    if (!heatmap) return;
+    heatmap.innerHTML = '';
+    for (let i = 0; i < 30; i++) {
+        const dayDiv = document.createElement('div');
+        dayDiv.style.width = "100%";
+        dayDiv.style.height = "100%";
+        dayDiv.style.borderRadius = "3px";
+      dayDiv.style.background = "#2c2c2c"; // default dark bg
+
+        const entry = moods[moods.length - 1 - i];
+        if (entry) {
+        if (entry.mood === "Happy") dayDiv.style.background = "#78dbff";
+        if (entry.mood === "Sad") dayDiv.style.background = "#ff77c6";
+        if (entry.mood === "Calm") dayDiv.style.background = "#48dbfb";
+        if (entry.mood === "Anxious") dayDiv.style.background = "#ff6b6b";
+        }
+        heatmap.appendChild(dayDiv);
+    }
+    }
+
+  // Add Mood
+    function addMood(mood) {
+    const time = new Date().toLocaleTimeString();
+    moods.push({ mood, time });
+    updateCharts();
+    updateHeatmap();
+    }
+
+  // Event Listeners (hook your mood buttons if you have them)
+    document.querySelectorAll('.mood-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const mood = btn.getAttribute('data-mood');
+        addMood(mood);
+    });
+    });
+
+  // Init
+    initializeCharts();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Store moods (you can later replace this with localStorage or backend)
+    const moods = [];
+
+    // Chart instances
+    let moodFrequencyChart;
+    let moodTimelineChart;
+
+    // Initialize Mood Frequency Chart
+    function initializeMoodFrequencyChart() {
+        const ctx = document.getElementById("mood-frequency-chart").getContext("2d");
+        moodFrequencyChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: [],
+                datasets: [{
+                    label: "Mood Count",
+                    data: [],
+                    backgroundColor: "rgba(54, 162, 235, 0.7)",
+                    borderColor: "rgba(54, 162, 235, 1)",
+                    borderWidth: 1,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            }
         });
+    }
 
-        function setupEventListeners() {
-            const moodTextArea = document.getElementById('mood-text');
-            const analyzeBtn = document.getElementById('analyze-btn');
-            const voiceBtn = document.getElementById('voice-btn');
-            const themeToggle = document.getElementById('theme-toggle');
-            const charCount = document.getElementById('char-count');
-
-            moodTextArea.addEventListener('input', function() {
-                charCount.textContent = this.value.length;
-            });
-
-            analyzeBtn.addEventListener('click', analyzeMood);
-            voiceBtn.addEventListener('click', toggleVoiceInput);
-            themeToggle.addEventListener('click', toggleTheme);
-        }
-
-        function initializeVoiceRecognition() {
-            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-                recognition = new SpeechRecognition();
-                recognition.continuous = true;
-                recognition.interimResults = true;
-                recognition.lang = 'en-US';
-
-                recognition.onstart = function() {
-                    document.getElementById('voice-btn').classList.add('recording');
-                    document.getElementById('mood-text').classList.add('voice-input');
-                    document.getElementById('mood-text').placeholder = 'Listening... speak your thoughts';
-                };
-
-                recognition.onresult = function(event) {
-                    let finalTranscript = '';
-                    for (let i = event.resultIndex; i < event.results.length; i++) {
-                        if (event.results[i].isFinal) {
-                            finalTranscript += event.results[i][0].transcript;
-                        }
-                    }
-                    if (finalTranscript) {
-                        document.getElementById('mood-text').value += finalTranscript + ' ';
-                        document.getElementById('char-count').textContent = document.getElementById('mood-text').value.length;
-                    }
-                };
-
-                recognition.onend = function() {
-                    document.getElementById('voice-btn').classList.remove('recording');
-                    document.getElementById('mood-text').classList.remove('voice-input');
-                    document.getElementById('mood-text').placeholder = 'Describe your mental state, thoughts, or feelings...';
-                };
+    // Initialize Mood Timeline Chart
+    function initializeMoodTimelineChart() {
+        const ctx = document.getElementById("mood-timeline-chart").getContext("2d");
+        moodTimelineChart = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: [],
+                datasets: [{
+                    label: "Mood Over Time",
+                    data: [],
+                    borderColor: "rgba(75, 192, 192, 1)",
+                    backgroundColor: "rgba(75, 192, 192, 0.2)",
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 4,
+                    pointBackgroundColor: "rgba(75, 192, 192, 1)"
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
             }
+        });
+    }
+
+    // Initialize Heatmap
+    function initializeHeatmap() {
+        const container = document.getElementById("heatmap");
+        if (!container) return;
+        container.innerHTML = "";
+
+        const days = 30; // last 30 days
+        for (let i = 0; i < days; i++) {
+            const div = document.createElement("div");
+            div.classList.add("heatmap-day");
+            div.dataset.date = new Date(Date.now() - (days - i - 1) * 86400000).toISOString().split("T")[0];
+            div.style.width = "16px";
+            div.style.height = "16px";
+            div.style.margin = "2px";
+            div.style.display = "inline-block";
+            div.style.borderRadius = "4px";
+            div.style.backgroundColor = "#e0e0e0";
+            container.appendChild(div);
         }
+    }
 
-        function toggleVoiceInput() {
-            if (!recognition) {
-                alert('Voice recognition not supported in this browser. Try Chrome or Edge.');
-                return;
-            }
+    // Update all visualizations
+    function updateVisualizations() {
+        // Update Mood Frequency
+        const moodCounts = moods.reduce((acc, mood) => {
+            acc[mood.mood] = (acc[mood.mood] || 0) + 1;
+            return acc;
+        }, {});
 
-            if (document.getElementById('voice-btn').classList.contains('recording')) {
-                recognition.stop();
-            } else {
-                recognition.start();
-            }
-        }
+        moodFrequencyChart.data.labels = Object.keys(moodCounts);
+        moodFrequencyChart.data.datasets[0].data = Object.values(moodCounts);
+        moodFrequencyChart.update();
 
-        function toggleTheme() {
-            const themeToggle = document.getElementById('theme-toggle');
-            const body = document.body;
-            
-            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            themeToggle.classList.toggle('light');
-            
-            if (currentTheme === 'light') {
-                body.style.background = 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #dee2e6 100%)';
-                document.documentElement.style.setProperty('--dark-bg', '#f8f9fa');
-                document.documentElement.style.setProperty('--card-bg', 'rgba(255, 255, 255, 0.8)');
-                document.body.style.color = '#333';
-            } else {
-                body.style.background = 'linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%)';
-                document.documentElement.style.setProperty('--dark-bg', '#0a0a0a');
-                document.documentElement.style.setProperty('--card-bg', 'rgba(0, 0, 0, 0.4)');
-                document.body.style.color = 'white';
-            }
-        }
+        // Update Mood Timeline
+        moodTimelineChart.data.labels = moods.map(m => m.date);
+        moodTimelineChart.data.datasets[0].data = moods.map(m => m.value);
+        moodTimelineChart.update();
 
-        async function analyzeMood() {
-            const moodTextArea = document.getElementById('mood-text');
-            const analyzeBtn = document.getElementById('analyze-btn');
-            const text = moodTextArea.value.trim();
-            
-            if (!text) {
-                alert('Please describe your mental state for analysis.');
-                return;
-            }
+        // Update Heatmap
+        const dayDivs = document.querySelectorAll(".heatmap-day");
+        dayDivs.forEach(div => {
+            const count = moods.filter(m => m.date === div.dataset.date).length;
+            div.style.backgroundColor = count === 0 ? "#e0e0e0"
+                : count < 2 ? "#90caf9"
+                : count < 4 ? "#42a5f5"
+                : "#1565c0";
+        });
+    }
 
-            // Show loading state
-            analyzeBtn.innerHTML = 'Analyzing<span style="width: 20px; height: 20px; border: 2px solid rgba(255, 255, 255, 0.3); border-top: 2px solid #78dbff; border-radius: 50%; animation: spin 1s linear infinite; display: inline-block; margin-left: 10px;"></span>';
-            analyzeBtn.disabled = true;
+    // Example mood logging function (replace with your input/button later)
+    function logMood(mood) {
+        const today = new Date().toISOString().split("T")[0];
+        moods.push({ mood, date: today, value: Math.floor(Math.random() * 5) + 1 });
+        updateVisualizations();
+    }
 
-            try {
-                const response = await fetch(`${API_BASE_URL}/analyze-mood`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ text: text })
-                });
+    // Initialize everything on load
+    window.onload = function() {
+        initializeMoodFrequencyChart();
+        initializeMoodTimelineChart();
+        initializeHeatmap();
 
-                if (!response.ok) {
-                    throw new Error('Analysis failed');
-                }
-
-                const result = await response.json();
-                displayMoodResult(result);
-                moodHistory.unshift(result);
-                updateMoodChart();
-                updateStats();
-                checkCrisisLevel(result.mood_score);
-                updatePrediction();
-                
-                moodTextArea.value = '';
-                document.getElementById('char-count').textContent = '0';
-                
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Neural network offline. Please ensure backend is running.');
-            } finally {
-                analyzeBtn.innerHTML = 'Analyze Brain Patterns';
-                analyzeBtn.disabled = false;
-            }
-        }
-
-        function displayMoodResult(result) {
-            const resultsSection = document.getElementById('results-section');
-            resultsSection.style.display = 'block';
-            resultsSection.scrollIntoView({ behavior: 'smooth' });
-
-            // Animate mood score
-            animateCounter(0, result.mood_score, 'mood-score', 1500);
-            
-            document.getElementById('mood-category').textContent = result.mood_category;
-            document.getElementById('sentiment-value').textContent = result.polarity > 0 ? 'Positive' : result.polarity < 0 ? 'Negative' : 'Neutral';
-            document.getElementById('confidence-value').textContent = Math.round(result.subjectivity * 100) + '%';
-
-            // Update score circle color
-            const scoreCircle = document.querySelector('.score-circle');
-            setTimeout(() => {
-                scoreCircle.style.background = `conic-gradient(${result.color} 0deg ${result.mood_score * 3.6}deg, rgba(255, 255, 255, 0.1) ${result.mood_score * 3.6}deg 360deg)`;
-            }, 500);
-
-            // Display recommendations with staggered animation
-            const recommendationsList = document.getElementById('recommendations-list');
-            recommendationsList.innerHTML = '';
-            result.recommendations.forEach((rec, index) => {
-                setTimeout(() => {
-                    const div = document.createElement('div');
-                    div.style.cssText = `
-                        background: rgba(120, 219, 255, 0.1);
-                        border: 1px solid rgba(120, 219, 255, 0.2);
-                        border-radius: 10px;
-                        padding: 1rem;
-                        margin-bottom: 1rem;
-                        border-left: 4px solid #78dbff;
-                        transition: transform 0.3s ease;
-                    `;
-                    div.innerHTML = `<span style="color: #78dbff;">◦</span> ${rec}`;
-                    div.addEventListener('mouseenter', () => div.style.transform = 'translateX(5px)');
-                    div.addEventListener('mouseleave', () => div.style.transform = 'translateX(0)');
-                    recommendationsList.appendChild(div);
-                }, (index + 1) * 300);
-            });
-
-            // Show achievement if applicable
-            if (moodHistory.length === 7) {
-                showAchievement();
-            }
-        }
-
-        function checkCrisisLevel(moodScore) {
-            if (moodScore < 25 && moodHistory.length >= 3) {
-                const recentScores = moodHistory.slice(0, 3).map(entry => entry.mood_score);
-                const averageRecent = recentScores.reduce((a, b) => a + b, 0) / recentScores.length;
-                
-                if (averageRecent < 30) {
-                    showCrisisAlert();
-                }
-            }
-        }
-
-        function showCrisisAlert() {
-            const alert = document.getElementById('crisis-alert');
-            alert.classList.add('show');
-        }
-
-        function dismissAlert() {
-            const alert = document.getElementById('crisis-alert');
-            alert.classList.remove('show');
-        }
-
-        function showAchievement() {
-            const achievement = document.getElementById('achievement-card');
-            achievement.style.display = 'block';
-            setTimeout(() => {
-                achievement.style.display = 'none';
-            }, 5000);
-        }
-
-        function updatePrediction() {
-            if (moodHistory.length >= 3) {
-                const recentScores = moodHistory.slice(0, 3).map(entry => entry.mood_score);
-                const trend = recentScores[0] - recentScores[2];
-                const nextPredicted = recentScores[0] + (trend * 0.5);
-                const clampedPrediction = Math.max(0, Math.min(100, Math.round(nextPredicted)));
-                
-                document.getElementById('mood-prediction').textContent = `${clampedPrediction}%`;
-            }
-        }
-
-        function animateCounter(start, end, elementId, duration) {
-            const element = document.getElementById(elementId);
-            if (!element) return;
-            
-            const range = end - start;
-            const increment = Math.ceil(range / (duration / 50));
-            let current = start;
-            
-            const timer = setInterval(() => {
-                current += increment;
-                if (current >= end) {
-                    current = end;
-                    clearInterval(timer);
-                }
-                element.textContent = current;
-            }, 50);
-        }
-
-        function initializeMoodChart() {
-            const ctx = document.getElementById('mood-chart').getContext('2d');
-            
-            moodChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: 'Wellness Score',
-                        data: [],
-                        borderColor: '#78dbff',
-                        backgroundColor: 'rgba(120, 219, 255, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: '#78dbff',
-                        pointBorderColor: '#ffffff',
-                        pointBorderWidth: 2,
-                        pointRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            grid: { color: 'rgba(255,255,255,0.1)' },
-                            ticks: { color: 'rgba(255,255,255,0.7)' }
-                        },
-                        x: {
-                            grid: { color: 'rgba(255,255,255,0.1)' },
-                            ticks: { color: 'rgba(255,255,255,0.7)' }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            labels: { color: 'rgba(255,255,255,0.8)' }
-                        }
-                    }
-                }
-            });
-        }
-
-        function updateMoodChart() {
-            if (!moodChart) return;
-
-            const last10Entries = moodHistory.slice(0, 10).reverse();
-            const labels = last10Entries.map((entry, index) => {
-                const date = new Date(entry.timestamp);
-                return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            });
-            const scores = last10Entries.map(entry => entry.mood_score);
-
-            moodChart.data.labels = labels;
-            moodChart.data.datasets[0].data = scores;
-            moodChart.update();
-        }
-
-        function generateMoodHeatmap() {
-            const heatmapContainer = document.getElementById('mood-heatmap');
-            const days = 28; // 4 weeks
-            
-            for (let i = days - 1; i >= 0; i--) {
-                const day = document.createElement('div');
-                day.className = 'heatmap-day';
-                
-                // Generate random mood data for demonstration
-                const moodScore = Math.floor(Math.random() * 100);
-                const intensity = moodScore / 100;
-                
-                if (moodScore > 0) {
-                    day.style.background = `rgba(120, 219, 255, ${intensity})`;
-                    day.setAttribute('data-mood', `${moodScore}%`);
-                }
-                
-                heatmapContainer.appendChild(day);
-            }
-        }
-
-        function updateStats() {
-            if (moodHistory.length > 0) {
-                const scores = moodHistory.map(entry => entry.mood_score);
-                const avgMood = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
-                
-                animateCounter(parseInt(document.getElementById('total-entries').textContent) || 0, moodHistory.length, 'total-entries', 1000);
-                animateCounter(parseInt(document.getElementById('avg-mood').textContent) || 0, avgMood, 'avg-mood', 1200);
-                
-                const trend = scores.length >= 2 && scores[0] > scores[1] ? '↗ Rising' : '→ Stable';
-                document.getElementById('mood-trend').textContent = trend;
-            }
-        }
-
-        // Make functions global for onclick handlers
-        window.dismissAlert = dismissAlert;
-    </script>
+        // Demo: add some sample moods so charts don’t look empty
+        logMood("Happy");
+        logMood("Sad");
+        logMood("Excited");
+        logMood("Happy");
+    };
+</script>
 </body>
 </html>
